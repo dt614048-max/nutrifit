@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutri-Fit | Colegio Venecia I.E.D.</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'nutri-pink-light': '#FFE4E8',
+                        'nutri-pink': '#FF8DA1',
+                        'nutri-pink-vibrant': '#FF6B8B',
+                        'nutri-pink-dark': '#E11D48',
+                        'nutri-yellow-light': '#FFF9C4',
+                        'nutri-yellow': '#FEF08A',
+                        'nutri-yellow-vibrant': '#FACC15',
+                        'nutri-yellow-dark': '#B45309',
+                        'nutri-cream': '#FEF9C3',
+                        'nutri-dark': '#1F2937'
+                    },
+                    fontFamily: {
+                        sans: ['Quicksand', 'sans-serif'],
+                        display: ['Fredoka', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(135deg, #FFE4E8 0%, #FFF9C4 50%, #FEF08A 100%);
+            min-height: 100vh;
+        }
+
+        h1, h2, h3, h4, .font-display {
+            font-family: 'Fredoka', sans-serif;
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.93);
+            backdrop-filter: blur(12px);
+            border: 2px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 15px 35px rgba(225, 29, 72, 0.08);
+        }
+
+        .option-card {
+            transition: all 0.2s ease-in-out;
+        }
+
+        .option-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 18px rgba(255, 107, 139, 0.2);
+        }
+
+        .option-card.selected {
+            border-color: #FF6B8B;
+            background-color: #FFE4E8;
+            box-shadow: 0 0 0 2px #FF6B8B;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .btn-gradient-pink {
+            background: linear-gradient(135deg, #FF6B8B 0%, #E11D48 100%);
+            transition: all 0.3s ease;
+        }
+
+        .btn-gradient-pink:hover {
+            background: linear-gradient(135deg, #E11D48 0%, #BE123C 100%);
+            box-shadow: 0 8px 20px rgba(225, 29, 72, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .btn-gradient-yellow {
+            background: linear-gradient(135deg, #FACC15 0%, #EAB308 100%);
+            color: #422006;
+            transition: all 0.3s ease;
+        }
+
+        .btn-gradient-yellow:hover {
+            background: linear-gradient(135deg, #EAB308 0%, #CA8A04 100%);
+            box-shadow: 0 8px 20px rgba(234, 179, 8, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Estilos 3D para el Juego de Memoria de Pares */
+        .perspective-1000 {
+            perspective: 1000px;
+        }
+
+        .memory-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.5s cubic-bezier(0.4, 0.2, 0.2, 1);
+            transform-style: preserve-3d;
+        }
+
+        .memory-card.flipped .memory-card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .memory-card-front, .memory-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            border-radius: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0.5rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.06);
+        }
+
+        .memory-card-front {
+            background: linear-gradient(135deg, #FF6B8B 0%, #E11D48 100%);
+            border: 3px solid #FFE4E8;
+            color: white;
+        }
+
+        .memory-card-back {
+            background-color: #FFFFFF;
+            transform: rotateY(180deg);
+            border: 3px solid #FACC15;
+        }
+
+        .memory-card.matched .memory-card-back {
+            background: linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%);
+            border-color: #10B981;
+            animation: pulse-success 0.5s ease-in-out;
+        }
+
+        @keyframes pulse-success {
+            0% { transform: rotateY(180deg) scale(1); }
+            50% { transform: rotateY(180deg) scale(1.06); }
+            100% { transform: rotateY(180deg) scale(1); }
+        }
+    </style>
+</head>
+<body class="flex flex-col justify-between min-h-screen p-2 sm:p-5 text-nutri-dark">
+
+    <!-- Header Institucional -->
+    <header class="max-w-6xl mx-auto w-full bg-white/90 rounded-2xl p-4 border border-white/80 shadow-md backdrop-blur-md mb-6">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-nutri-pink-vibrant to-nutri-yellow-vibrant flex items-center justify-center text-white shadow-md text-2xl">
+                    <i class="fa-solid fa-apple-whole"></i>
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-2xl font-bold bg-gradient-to-r from-nutri-pink-dark to-nutri-pink-vibrant bg-clip-text text-transparent">
+                            PROYECTO NUTRI-FIT
+                        </h1>
+                        <span class="text-[11px] px-2.5 py-0.5 rounded-full bg-pink-100 text-pink-700 font-bold border border-pink-200">
+                            11-03 J.T.
+                        </span>
+                    </div>
+                    <p class="text-xs text-gray-600 font-semibold">
+                        <i class="fa-solid fa-school text-nutri-pink-vibrant mr-1"></i> Colegio Venecia I.E.D.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Navegación por Pestañas -->
+            <nav class="flex flex-wrap items-center gap-1.5 sm:gap-2">
+                <button onclick="switchTab('marco')" id="tab-marco" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all bg-nutri-pink-vibrant text-white shadow-sm">
+                    <i class="fa-solid fa-bullseye mr-1"></i>Marco
+                </button>
+                <button onclick="switchTab('diag')" id="tab-diag" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all bg-white text-gray-700 hover:bg-nutri-pink-light border border-pink-200">
+                    <i class="fa-solid fa-clipboard-question mr-1 text-nutri-pink-dark"></i>1. Identificación
+                </button>
+                <button onclick="switchTab('fam')" id="tab-fam" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all bg-white text-gray-700 hover:bg-nutri-yellow-light border border-yellow-200">
+                    <i class="fa-solid fa-people-roof mr-1 text-amber-600"></i>2. Familia
+                </button>
+                <button onclick="switchTab('ped')" id="tab-ped" class="px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all bg-white text-gray-700 hover:bg-nutri-pink-light border border-pink-200">
+                    <i class="fa-solid fa-brain mr-1 text-nutri-pink-vibrant"></i>3. Actividades
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="max-w-6xl mx-auto w-full my-auto">
+
+        <!-- ================= PESTAÑA 0: MARCO DEL PROYECTO ================= -->
+        <section id="sec-marco" class="space-y-6 fade-in">
+            <div class="glass-card rounded-3xl p-6 sm:p-10 text-center">
+                
+                <span class="inline-block mb-3 px-4 py-1.5 rounded-full bg-nutri-yellow text-amber-900 text-xs font-bold uppercase tracking-wider border border-amber-300">
+                    Investigación Pedagógica Institucional
+                </span>
+
+                <h2 class="text-2xl sm:text-4xl font-bold text-gray-800 mb-4 leading-tight">
+                    Alimentación Saludable, Energía y Bienestar Escolar
+                </h2>
+
+                <!-- Pregunta Problema Destacada -->
+                <div class="my-6 p-5 rounded-2xl bg-gradient-to-r from-pink-500 to-rose-600 text-white shadow-lg text-left max-w-4xl mx-auto">
+                    <div class="flex items-center gap-2 mb-2 text-yellow-200 font-bold text-xs uppercase tracking-wider">
+                        <i class="fa-solid fa-circle-question text-base"></i> Pregunta Problema
+                    </div>
+                    <p class="text-base sm:text-xl font-semibold leading-relaxed">
+                        ¿De qué manera influyen los hábitos alimenticios en los niveles de energía, capacidad de concentración y rendimiento académico de los estudiantes durante la jornada escolar en el Colegio Venecia I.E.D.?
+                    </p>
+                </div>
+
+                <!-- Objetivos Institucionales -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-left max-w-5xl mx-auto mt-8">
+                    
+                    <!-- Objetivo General -->
+                    <div class="p-6 rounded-3xl bg-nutri-yellow-light/80 border-2 border-amber-300 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <div class="flex items-center gap-3 mb-3">
+                                <div class="w-10 h-10 rounded-2xl bg-amber-400 text-amber-950 flex items-center justify-center font-bold text-lg shadow-sm">
+                                    <i class="fa-solid fa-star"></i>
+                                </div>
+                                <h3 class="text-xl font-bold text-amber-950">OBJETIVO GENERAL</h3>
+                            </div>
+                            <p class="text-sm sm:text-base text-gray-800 font-medium leading-relaxed">
+                                Fomentar hábitos de alimentación saludable en los estudiantes con el fin de mejorar sus niveles de energía y bienestar durante la jornada escolar en el Colegio Venecia I.E.D.
+                            </p>
+                        </div>
+                        <div class="mt-4 pt-4 border-t border-amber-200 text-xs text-amber-800 font-bold flex items-center gap-2">
+                            <i class="fa-solid fa-check-circle text-amber-600"></i> Impacto directo en el bienestar escolar
+                        </div>
+                    </div>
+
+                    <!-- Objetivos Específicos -->
+                    <div class="p-6 rounded-3xl bg-nutri-pink-light/70 border-2 border-pink-300 shadow-sm">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-2xl bg-nutri-pink-vibrant text-white flex items-center justify-center font-bold text-lg shadow-sm">
+                                <i class="fa-solid fa-list-check"></i>
+                            </div>
+                            <h3 class="text-xl font-bold text-pink-950">OBJETIVOS ESPECÍFICOS</h3>
+                        </div>
+                        <ul class="space-y-3 text-xs sm:text-sm text-gray-800 font-medium">
+                            <li class="flex items-start gap-2.5 bg-white p-2.5 rounded-xl border border-pink-200">
+                                <span class="w-5 h-5 rounded-full bg-nutri-pink-vibrant text-white flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5">1</span>
+                                <span><strong>Identificar</strong> los hábitos alimenticios de los estudiantes durante la jornada escolar mediante el test diagnóstico.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5 bg-white p-2.5 rounded-xl border border-pink-200">
+                                <span class="w-5 h-5 rounded-full bg-nutri-pink-vibrant text-white flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5">2</span>
+                                <span><strong>Sensibilizar</strong> a estudiantes y familias sobre la importancia de una alimentación balanceada.</span>
+                            </li>
+                            <li class="flex items-start gap-2.5 bg-white p-2.5 rounded-xl border border-pink-200">
+                                <span class="w-5 h-5 rounded-full bg-nutri-pink-vibrant text-white flex items-center justify-center text-[10px] font-bold flex-shrink-0 mt-0.5">3</span>
+                                <span><strong>Promover</strong> el consumo de alimentos saludables e hidratación mediante el Juego de Memoria Nutri-Fit.</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+
+                <!-- Botón de Inicio de la Experiencia -->
+                <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+                    <button onclick="switchTab('diag')" class="btn-gradient-pink text-white px-8 py-4 rounded-2xl font-bold text-base shadow-lg flex items-center justify-center gap-3">
+                        <span>Iniciar Test Diagnóstico (Obj. 1)</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    <button onclick="switchTab('ped')" class="btn-gradient-yellow px-8 py-4 rounded-2xl font-bold text-base shadow-lg flex items-center justify-center gap-3">
+                        <i class="fa-solid fa-gamepad"></i>
+                        <span>Ir al Juego de Memoria (Obj. 3)</span>
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= PESTAÑA 1: DIAGNÓSTICO (OBJETIVO ESPECÍFICO 1) ================= -->
+        <section id="sec-diag" class="hidden space-y-6 fade-in">
+            <!-- Test Diagnóstico -->
+            <div id="diag-quiz-box" class="glass-card rounded-3xl p-5 sm:p-8">
+                <!-- Header de Módulo -->
+                <div class="flex items-center justify-between border-b border-gray-200 pb-4 mb-6">
+                    <div>
+                        <span class="text-xs font-bold text-nutri-pink-dark uppercase tracking-wider bg-pink-100 px-3 py-1 rounded-full border border-pink-200">
+                            Objetivo Específico 1: Identificación
+                        </span>
+                        <h2 class="text-xl sm:text-2xl font-bold text-gray-800 mt-1">
+                            Test Diagnóstico de Hábitos Alimenticios e Hidratación
+                        </h2>
+                    </div>
+                    <span id="diag-count" class="text-xs font-bold text-gray-500 bg-gray-100 px-3 py-1.5 rounded-xl">
+                        Pregunta 1 de 12
+                    </span>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="w-full h-2.5 bg-gray-200 rounded-full overflow-hidden mb-6">
+                    <div id="diag-progress" class="h-full bg-gradient-to-r from-nutri-pink-vibrant to-nutri-pink-dark transition-all duration-300" style="width: 8.3%"></div>
+                </div>
+
+                <!-- Pregunta -->
+                <div class="mb-6">
+                    <span id="diag-cat" class="inline-block text-xs font-bold text-amber-800 bg-nutri-yellow px-2.5 py-1 rounded-lg mb-2">
+                        Categoría
+                    </span>
+                    <h3 id="diag-q-text" class="text-lg sm:text-xl font-bold text-gray-800">
+                        Cargando pregunta...
+                    </h3>
+                </div>
+
+                <!-- Opciones -->
+                <div id="diag-options" class="grid grid-cols-1 gap-3 mb-6">
+                    <!-- Dinámico -->
+                </div>
+
+                <!-- Control Navegación -->
+                <div class="flex justify-between items-center border-t border-gray-100 pt-4">
+                    <button id="diag-btn-prev" onclick="diagPrev()" class="px-4 py-2 rounded-xl text-xs font-bold bg-gray-100 text-gray-600 hover:bg-gray-200 disabled:opacity-40">
+                        <i class="fa-solid fa-arrow-left mr-1"></i> Anterior
+                    </button>
+                    <button id="diag-btn-next" onclick="diagNext()" disabled class="btn-gradient-pink text-white px-6 py-2 rounded-xl text-xs font-bold disabled:opacity-50">
+                        <span id="diag-btn-next-text">Siguiente</span> <i class="fa-solid fa-arrow-right ml-1"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Pantalla de Resultados del Diagnóstico -->
+            <div id="diag-results-box" class="glass-card rounded-3xl p-6 sm:p-8 hidden">
+                <div class="text-center mb-6">
+                    <span class="px-3 py-1 rounded-full bg-nutri-yellow text-amber-900 font-bold text-xs uppercase tracking-wider">
+                        Diagnóstico Completado - Colegio Venecia I.E.D.
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mt-2">
+                        Resultados de Hábitos e Impacto Escolar
+                    </h2>
+                </div>
+
+                <!-- Metricas principales -->
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+                    <div class="p-4 rounded-2xl bg-nutri-pink-light/70 border border-pink-200 text-center">
+                        <i class="fa-solid fa-bolt text-2xl text-nutri-pink-dark mb-1"></i>
+                        <h4 class="text-xs font-bold text-pink-900 uppercase">Nivel de Energía</h4>
+                        <div id="res-energy-val" class="text-2xl font-black text-gray-800">0%</div>
+                        <p id="res-energy-desc" class="text-[11px] text-gray-600 mt-1">Evaluando...</p>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-nutri-yellow-light/80 border border-amber-200 text-center">
+                        <i class="fa-solid fa-brain text-2xl text-amber-700 mb-1"></i>
+                        <h4 class="text-xs font-bold text-amber-900 uppercase">Capacidad de Foco</h4>
+                        <div id="res-focus-val" class="text-2xl font-black text-gray-800">0%</div>
+                        <p id="res-focus-desc" class="text-[11px] text-gray-600 mt-1">Evaluando...</p>
+                    </div>
+
+                    <div class="p-4 rounded-2xl bg-white border border-rose-200 text-center shadow-sm">
+                        <i class="fa-solid fa-droplet text-2xl text-rose-600 mb-1"></i>
+                        <h4 class="text-xs font-bold text-rose-900 uppercase">Índice de Hidratación</h4>
+                        <div id="res-hydro-val" class="text-2xl font-black text-gray-800">0%</div>
+                        <p id="res-hydro-desc" class="text-[11px] text-gray-600 mt-1">Evaluando...</p>
+                    </div>
+                </div>
+
+                <!-- Respuesta Específica a la Pregunta Problema del Estudiante -->
+                <div class="p-5 rounded-2xl bg-nutri-yellow-light border border-amber-300 mb-6">
+                    <h4 class="font-bold text-amber-950 text-sm mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-circle-info text-amber-700"></i>
+                        Respuesta a tu Pregunta Problema Personalizada:
+                    </h4>
+                    <p id="diag-problem-answer" class="text-xs sm:text-sm text-gray-800 leading-relaxed">
+                        Cargando análisis...
+                    </p>
+                </div>
+
+                <!-- Botón hacia Sensibilización -->
+                <div class="flex justify-center">
+                    <button onclick="switchTab('fam')" class="btn-gradient-pink text-white px-6 py-3 rounded-xl font-bold text-xs sm:text-sm flex items-center gap-2">
+                        <span>Paso Siguiente: Sensibilización Familiar (Obj. 2)</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PESTAÑA 2: SENSIBILIZACIÓN FAMILIAR (OBJETIVO ESPECÍFICO 2) ================= -->
+        <section id="sec-fam" class="hidden space-y-6 fade-in">
+            <div class="glass-card rounded-3xl p-6 sm:p-8">
+                
+                <div class="text-center max-w-2xl mx-auto mb-8">
+                    <span class="text-xs font-bold text-amber-900 uppercase tracking-wider bg-nutri-yellow px-3 py-1 rounded-full border border-amber-300">
+                        Objetivo Específico 2: Sensibilización
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mt-2">
+                        Guía de Alimentación Balanceada para Estudiantes y Familias
+                    </h2>
+                    <p class="text-xs sm:text-sm text-gray-600 mt-1">
+                        Estrategias prácticas y económicas para promover el rendimiento escolar desde el hogar en el Colegio Venecia I.E.D.
+                    </p>
+                </div>
+
+                <!-- Tarjetas de Sensibilización Familia/Estudiante -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-8">
+                    
+                    <div class="p-5 rounded-2xl bg-white border border-pink-200 shadow-sm">
+                        <div class="w-10 h-10 rounded-xl bg-pink-100 text-nutri-pink-dark flex items-center justify-center font-bold text-lg mb-3">
+                            <i class="fa-solid fa-sun"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-800 text-sm mb-2">1. El Poder del Desayuno</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">
+                            Ir al colegio sin desayunar o solo con bebidas azucaradas provoca hipoglucemia a las 9:00 AM, causando falta de atención y bajo rendimiento en las primeras clases.
+                        </p>
+                    </div>
+
+                    <div class="p-5 rounded-2xl bg-white border border-amber-200 shadow-sm">
+                        <div class="w-10 h-10 rounded-xl bg-amber-100 text-amber-800 flex items-center justify-center font-bold text-lg mb-3">
+                            <i class="fa-solid fa-basket-shopping"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-800 text-sm mb-2">2. Loncheras Económicas</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">
+                            Reemplaza paquetes fritos y gaseosas por huevos cocidos, frutas de temporada (banano, guayaba, naranja) y termos con agua pura. Ahorra dinero y mejora la salud.
+                        </p>
+                    </div>
+
+                    <div class="p-5 rounded-2xl bg-white border border-rose-200 shadow-sm">
+                        <div class="w-10 h-10 rounded-xl bg-rose-100 text-rose-700 flex items-center justify-center font-bold text-lg mb-3">
+                            <i class="fa-solid fa-triangle-exclamation"></i>
+                        </div>
+                        <h3 class="font-bold text-gray-800 text-sm mb-2">3. Peligro del Azúcar Excesivo</h3>
+                        <p class="text-xs text-gray-600 leading-relaxed">
+                            Los jugos de caja y galletas rellenas provocan un pico de energía muy corto seguido de cansancio extremo ("sopor postprandial") en las últimas horas de clase.
+                        </p>
+                    </div>
+
+                </div>
+
+                <!-- Compromiso Familiar Interactivo -->
+                <div class="p-6 rounded-2xl bg-gradient-to-br from-pink-50 to-yellow-50 border-2 border-pink-200">
+                    <h3 class="text-lg font-bold text-gray-800 mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-file-signature text-nutri-pink-dark"></i>
+                        Compromiso Nutri-Fit para el Hogar
+                    </h3>
+                    <p class="text-xs text-gray-600 mb-4">
+                        Escribe el nombre del estudiante y de la familia para generar tu tarjeta digital de compromiso de alimentación e hidratación saludable.
+                    </p>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Nombre del Estudiante:</label>
+                            <input type="text" id="commit-student" placeholder="Ej: Juan Pérez - 11-03 J.T." class="w-full p-2.5 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-nutri-pink-vibrant outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Familia Compromiso:</label>
+                            <input type="text" id="commit-family" placeholder="Ej: Familia Pérez Rodríguez" class="w-full p-2.5 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-nutri-pink-vibrant outline-none">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="block text-[11px] font-bold text-gray-700 uppercase mb-1">Nuestro Compromiso Principal:</label>
+                        <select id="commit-goal" class="w-full p-2.5 rounded-xl border border-gray-300 text-xs focus:ring-2 focus:ring-nutri-pink-vibrant outline-none">
+                            <option value="1">Llevar termo de agua todos los días al colegio Venecia I.E.D.</option>
+                            <option value="2">Incluir al menos 1 fruta fresca entera en la lonchera diaria.</option>
+                            <option value="3">Desayunar con proteína (huevos/lácteos) antes de salir de casa.</option>
+                            <option value="4">Reducir compras de paquetes fritos y gaseosas en la cafetería.</option>
+                        </select>
+                    </div>
+
+                    <button onclick="generateCommitment()" class="btn-gradient-yellow px-6 py-2.5 rounded-xl text-xs font-bold w-full sm:w-auto">
+                        <i class="fa-solid fa-stamp mr-1"></i> Generar Tarjeta de Compromiso
+                    </button>
+
+                    <!-- Resultado Compromiso -->
+                    <div id="commitment-card" class="hidden mt-4 p-4 rounded-xl bg-white border-2 border-amber-400 text-center fade-in">
+                        <div class="text-xs font-bold text-amber-800 uppercase tracking-wider">Certificado de Compromiso Nutri-Fit</div>
+                        <h4 id="card-student-name" class="text-base font-bold text-pink-900 mt-1">Estudiante</h4>
+                        <p id="card-fam-name" class="text-xs text-gray-600 font-semibold">Familia</p>
+                        <p id="card-goal-text" class="text-xs font-bold text-gray-800 my-2 bg-amber-50 p-2 rounded-lg border border-amber-200">
+                            Compromiso...
+                        </p>
+                        <span class="text-[10px] text-gray-500 font-bold">Colegio Venecia I.E.D. | Proyecto Nutri-Fit 11-03 J.T.</span>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= PESTAÑA 3: ACTIVIDADES PEDAGÓGICAS - JUEGO DE MEMORIA (OBJETIVO ESPECÍFICO 3) ================= -->
+        <section id="sec-ped" class="hidden space-y-6 fade-in">
+            
+            <div class="glass-card rounded-3xl p-5 sm:p-8">
+                <!-- Encabezado del Juego -->
+                <div class="text-center max-w-2xl mx-auto mb-6">
+                    <span class="text-xs font-bold text-nutri-pink-dark uppercase tracking-wider bg-pink-100 px-3 py-1 rounded-full border border-pink-200">
+                        Objetivo Específico 3: Actividad Pedagógica
+                    </span>
+                    <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mt-2">
+                        🧠 Juego de Memoria Nutri-Fit
+                    </h2>
+                    <p class="text-xs sm:text-sm text-gray-600 mt-1">
+                        Encuentra los 8 pares de alimentos e hidratación saludable. ¡Ejercita tu mente y aprende sobre nutrición escolar!
+                    </p>
+                </div>
+
+                <!-- Panel de Estado / Contadores del Juego -->
+                <div class="bg-gradient-to-r from-pink-500 via-rose-500 to-amber-500 rounded-2xl p-4 text-white shadow-md mb-6 max-w-3xl mx-auto flex flex-wrap items-center justify-between gap-3">
+                    
+                    <div class="flex items-center gap-2">
+                        <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-hand-pointer"></i>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-pink-100 block">Intentos</span>
+                            <span id="mem-moves" class="text-xl font-extrabold font-mono">0</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-clock"></i>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-pink-100 block">Tiempo</span>
+                            <span id="mem-timer" class="text-xl font-extrabold font-mono">00:00</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <div class="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center text-lg">
+                            <i class="fa-solid fa-check-double"></i>
+                        </div>
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-pink-100 block">Pares</span>
+                            <span class="text-xl font-extrabold font-mono"><span id="mem-pairs">0</span>/8</span>
+                        </div>
+                    </div>
+
+                    <!-- Botón Reiniciar -->
+                    <button onclick="initMemoryGame()" class="bg-white text-pink-700 hover:bg-pink-50 font-bold px-4 py-2 rounded-xl text-xs shadow-md transition-all flex items-center gap-1.5 active:scale-95">
+                        <i class="fa-solid fa-rotate-right"></i>
+                        <span>Reiniciar</span>
+                    </button>
+                </div>
+
+                <!-- Tablero de Cartas (4x4) -->
+                <div id="memory-board" class="grid grid-cols-4 gap-2.5 sm:gap-4 max-w-2xl mx-auto my-4">
+                    <!-- Dinámico -->
+                </div>
+
+                <!-- Caja Educativa de Retroalimentación de la Carta Seleccionada -->
+                <div id="memory-info-box" class="max-w-2xl mx-auto mt-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-center">
+                    <p class="text-xs font-semibold text-amber-900 flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-lightbulb text-amber-500 text-base"></i>
+                        <span id="memory-info-text">¡Voltea dos cartas idénticas para descubrir los beneficios de cada alimento!</span>
+                    </p>
+                </div>
+
+                <!-- Mensaje de Victoria / Modal Integrado -->
+                <div id="memory-victory-modal" class="hidden max-w-2xl mx-auto mt-6 p-6 rounded-3xl bg-gradient-to-br from-emerald-50 to-teal-50 border-2 border-emerald-300 text-center fade-in shadow-xl">
+                    <div class="w-16 h-16 rounded-full bg-emerald-500 text-white flex items-center justify-center text-3xl mx-auto mb-3 shadow-lg">
+                        <i class="fa-solid fa-trophy"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-emerald-950 mb-1">
+                        ¡Felicitaciones, Campeón Nutri-Fit! 🏆
+                    </h3>
+                    <p class="text-xs sm:text-sm text-emerald-800 mb-4 font-medium">
+                        Has completado el juego de memoria y descubierto los pares de alimentos saludables para potenciar tu energía en el Colegio Venecia I.E.D.
+                    </p>
+                    
+                    <div class="flex justify-center gap-6 my-3 text-xs sm:text-sm font-bold text-emerald-900 bg-white/80 p-3 rounded-2xl border border-emerald-200">
+                        <div>Intentos Totales: <span id="vic-moves" class="text-emerald-600 text-base">0</span></div>
+                        <div>Tiempo Final: <span id="vic-time" class="text-emerald-600 text-base font-mono">00:00</span></div>
+                    </div>
+
+                    <button onclick="initMemoryGame()" class="mt-4 btn-gradient-pink text-white px-8 py-3 rounded-xl font-bold text-xs sm:text-sm shadow-md inline-flex items-center gap-2">
+                        <i class="fa-solid fa-play"></i>
+                        <span>Volver a Jugar</span>
+                    </button>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="max-w-6xl mx-auto w-full text-center py-4 text-xs text-gray-600">
+        <p>© 2026 <strong>Proyecto Nutri-Fit</strong> — Colegio Venecia I.E.D. | Curso 11-03 J.T.</p>
+        <p class="text-[10px] text-gray-500 mt-0.5">Fomentando la salud, hidratación y el rendimiento escolar de nuestra comunidad educativa.</p>
+    </footer>
+
+    <!-- LOGICA JAVASCRIPT -->
+    <script>
+        // ==========================================
+        // 1. CUESTIONARIO DIAGNÓSTICO (OBJETIVO ESPECÍFICO 1)
+        // ==========================================
+        const diagQuestions = [
+            {
+                cat: "Desayuno en Casa",
+                q: "¿Con qué frecuencia desayunas antes de ir al Colegio Venecia I.E.D.?",
+                opts: [
+                    { t: "Nunca / Salgo en ayunas casi todos los días", e: 1, f: 1, h: 1 },
+                    { t: "A veces / Solo tinto, café dulce o galletas rápidas", e: 2, f: 2, h: 1 },
+                    { t: "Siempre / Desayuno completo con huevo, leche/avena y arepa/pan", e: 4, f: 4, h: 3 }
+                ]
+            },
+            {
+                cat: "Lonchera Escolar",
+                q: "¿Qué acostumbras consumir durante el descanso/recreo escolar?",
+                opts: [
+                    { t: "Paquetes fritos, gaseosas o golosinas de la cafetería", e: 1, f: 1, h: 1 },
+                    { t: "Jugos en caja comercial con galletas dulces o ponqué", e: 2, f: 2, h: 1 },
+                    { t: "Fruta fresca, frutos secos, sándwich de queso/pavo o agua", e: 4, f: 4, h: 4 }
+                ]
+            },
+            {
+                cat: "Hidratación Diaria",
+                q: "¿Cuánta agua pura bebes durante la jornada de clases (7:00 AM a 1:30 PM)?",
+                opts: [
+                    { t: "Menos de 1 vaso o solo cuando tengo mucha sed", e: 1, f: 1, h: 1 },
+                    { t: "Aproximadamente 2 a 3 vasos (1 termo pequeño)", e: 3, f: 3, h: 3 },
+                    { t: "4 vasos o más (1 litro en termo propio)", e: 4, f: 4, h: 4 }
+                ]
+            },
+            {
+                cat: "Energía en Clases",
+                q: "¿Cómo te sientes físicamente durante las primeras dos horas de clase?",
+                opts: [
+                    { t: "Con mucho sueño, bostezo constante y pesadez", e: 1, f: 1, h: 1 },
+                    { t: "Con energía al principio, pero cae rápidamente antes del descanso", e: 2, f: 2, h: 2 },
+                    { t: "Despierto/a, activo/a y listo para aprender", e: 4, f: 4, h: 3 }
+                ]
+            },
+            {
+                cat: "Atención y Foco",
+                q: "Cuando el profesor explica un tema complejo en el tablero:",
+                opts: [
+                    { t: "Me cuesta mucho concentrarme y me distraigo fácilmente", e: 1, f: 1, h: 2 },
+                    { t: "Entiendo a ratos, pero me da fatiga mental rápido", e: 2, f: 2, h: 2 },
+                    { t: "Mantengo la atención, tomo apuntes y comprendo bien", e: 4, f: 4, h: 4 }
+                ]
+            },
+            {
+                cat: "Consumo de Azúcar",
+                q: "¿Recurres a bebidas energizantes o gaseosas dulces para mantenerte despierto/a?",
+                opts: [
+                    { t: "Sí, frecuentemente durante la semana", e: 1, f: 1, h: 1 },
+                    { t: "Ocasionalmente cuando me siento muy cansado/a", e: 2, f: 2, h: 2 },
+                    { t: "Casi nunca o nunca; prefiero agua o jugos naturales sin azúcar", e: 4, f: 4, h: 4 }
+                ]
+            },
+            {
+                cat: "Sopor Postprandial",
+                q: "¿Qué tan severo es el sueño que sientes después de comer en el descanso?",
+                opts: [
+                    { t: "Muy intenso; se me cierran los ojos en la siguiente clase", e: 1, f: 1, h: 1 },
+                    { t: "Moderado; me siento pesado pero logro aguantar", e: 2, f: 2, h: 2 },
+                    { t: "Leve o nulo; continuo con la misma energía", e: 4, f: 4, h: 3 }
+                ]
+            },
+            {
+                cat: "Rendimiento Académico",
+                q: "En las evaluaciones o exámenes escritos a última hora del colegio:",
+                opts: [
+                    { t: "Siento mente 'nublada' y me cuesta recordar lo estudiado", e: 1, f: 1, h: 1 },
+                    { t: "Rindo de manera regular, pero me agoto rápido", e: 2, f: 2, h: 2 },
+                    { t: "Tengo agilidad mental y resuelvo el examen con claridad", e: 4, f: 4, h: 4 }
+                ]
+            },
+            {
+                cat: "Dolores de Cabeza",
+                q: "¿Experimentas dolor de cabeza o mareos al final de la jornada escolar?",
+                opts: [
+                    { t: "Frecuentemente (3 o más veces por semana)", e: 1, f: 1, h: 1 },
+                    { t: "A veces, cuando hace calor o hay exámenes", e: 2, f: 2, h: 2 },
+                    { t: "Rara vez o nunca", e: 4, f: 4, h: 4 }
+                ]
+            },
+            {
+                cat: "Consumo de Frutas/Verduras",
+                q: "¿Cuántas porciones de fruta fresca o verduras consumes al día?",
+                opts: [
+                    { t: "Ninguna o rara vez", e: 1, f: 1, h: 1 },
+                    { t: "1 porción al día", e: 2, f: 3, h: 3 },
+                    { t: "2 o más porciones diarias", e: 4, f: 4, h: 4 }
+                ]
+            },
+            {
+                cat: "Ansiedad por Comida",
+                q: "¿Sientes necesidad de comer papas fritas o dulces entre clases?",
+                opts: [
+                    { t: "Sí, todo el tiempo siento ansiedad por comer mecatos", e: 1, f: 1, h: 1 },
+                    { t: "A veces cuando me aburro o estoy estresado/a", e: 2, f: 2, h: 2 },
+                    { t: "No, mis comidas me dejan satisfecho/a", e: 4, f: 4, h: 4 }
+                ]
+            },
+            {
+                cat: "Percepción de Salud",
+                q: "¿Consideras que mejorar tu alimentación e hidratación subiría tus notas en 11-03?",
+                opts: [
+                    { t: "Totalmente de acuerdo; el cansancio frena mi rendimiento", e: 2, f: 2, h: 2 },
+                    { t: "Tal vez un poco", e: 3, f: 3, h: 3 },
+                    { t: "Ya mantengo una excelente alimentación e hidratación", e: 4, f: 4, h: 4 }
+                ]
+            }
+        ];
+
+        let diagIdx = 0;
+        let diagAnswers = new Array(diagQuestions.length).fill(null);
+
+        function renderDiagQuestion() {
+            const q = diagQuestions[diagIdx];
+            document.getElementById('diag-count').textContent = `Pregunta ${diagIdx + 1} de ${diagQuestions.length}`;
+            document.getElementById('diag-progress').style.width = `${((diagIdx + 1) / diagQuestions.length) * 100}%`;
+            document.getElementById('diag-cat').textContent = q.cat;
+            document.getElementById('diag-q-text').textContent = q.q;
+
+            const container = document.getElementById('diag-options');
+            container.innerHTML = '';
+
+            q.opts.forEach((opt, idx) => {
+                const isSelected = diagAnswers[diagIdx] === idx;
+                const card = document.createElement('button');
+                card.type = 'button';
+                card.className = `option-card w-full p-3.5 rounded-2xl border text-left flex items-center justify-between gap-3 ${
+                    isSelected ? 'selected' : 'border-gray-200 bg-white hover:border-pink-300'
+                }`;
+                card.onclick = () => {
+                    diagAnswers[diagIdx] = idx;
+                    renderDiagQuestion();
+                };
+
+                card.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <span class="w-7 h-7 rounded-lg ${isSelected ? 'bg-nutri-pink-dark text-white' : 'bg-pink-100 text-nutri-pink-dark'} flex items-center justify-center font-bold text-xs">
+                            ${String.fromCharCode(65 + idx)}
+                        </span>
+                        <span class="font-medium text-gray-800 text-xs sm:text-sm">${opt.t}</span>
+                    </div>
+                    <div class="w-4 h-4 rounded-full border-2 ${isSelected ? 'border-nutri-pink-dark bg-nutri-pink-dark text-white' : 'border-gray-300'} flex items-center justify-center text-[9px]">
+                        ${isSelected ? '<i class="fa-solid fa-check"></i>' : ''}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+
+            document.getElementById('diag-btn-prev').disabled = diagIdx === 0;
+            const hasAns = diagAnswers[diagIdx] !== null;
+            document.getElementById('diag-btn-next').disabled = !hasAns;
+            document.getElementById('diag-btn-next-text').textContent = (diagIdx === diagQuestions.length - 1) ? 'Finalizar Diagnóstico' : 'Siguiente';
+        }
+
+        function diagNext() {
+            if (diagAnswers[diagIdx] === null) return;
+            if (diagIdx < diagQuestions.length - 1) {
+                diagIdx++;
+                renderDiagQuestion();
+            } else {
+                showDiagResults();
+            }
+        }
+
+        function diagPrev() {
+            if (diagIdx > 0) {
+                diagIdx--;
+                renderDiagQuestion();
+            }
+        }
+
+        function showDiagResults() {
+            document.getElementById('diag-quiz-box').classList.add('hidden');
+            document.getElementById('diag-results-box').classList.remove('hidden');
+
+            let eTot = 0, fTot = 0, hTot = 0;
+            const max = diagQuestions.length * 4;
+
+            diagAnswers.forEach((ansIdx, qIdx) => {
+                const opt = diagQuestions[qIdx].opts[ansIdx];
+                eTot += opt.e;
+                fTot += opt.f;
+                hTot += opt.h;
+            });
+
+            const ePct = Math.round((eTot / max) * 100);
+            const fPct = Math.round((fTot / max) * 100);
+            const hPct = Math.round((hTot / max) * 100);
+
+            document.getElementById('res-energy-val').textContent = `${ePct}%`;
+            document.getElementById('res-energy-desc').textContent = ePct > 70 ? 'Energía estable durante el día' : 'Riesgo alto de cansancio temprano';
+
+            document.getElementById('res-focus-val').textContent = `${fPct}%`;
+            document.getElementById('res-focus-desc').textContent = fPct > 70 ? 'Excelente capacidad de atención' : 'Dificultad de concentración en clases';
+
+            document.getElementById('res-hydro-val').textContent = `${hPct}%`;
+            document.getElementById('res-hydro-desc').textContent = hPct > 70 ? 'Nivel óptimo de agua corporal' : 'Alerta de deshidratación escolar';
+
+            document.getElementById('diag-problem-answer').innerHTML = `
+                De acuerdo con tus datos, tus hábitos de alimentación e hidratación generan un nivel de <strong>Energía del ${ePct}%</strong> y de <strong>Atención del ${fPct}%</strong> en el Colegio Venecia I.E.D.
+                ${(ePct < 60 || hPct < 60) ? 
+                    'Se evidencia que el bajo consumo de agua pura o el reemplazo del desayuno por productos fritos/azucarados es la causa principal de la fatiga a mitad de la jornada. Para subir tus notas y evitar dolores de cabeza, es urgente aplicar las actividades del Objetivo 2 y 3.' : 
+                    'Tus hábitos actuales favorecen tu salud. Mantener un termo de agua y desayuno nutritivo garantiza que tu cerebro procese los temas académicos sin interrupciones por cansancio.'
+                }
+            `;
+        }
+
+        // ==========================================
+        // 2. SENSIBILIZACIÓN FAMILIAR (OBJETIVO ESPECÍFICO 2)
+        // ==========================================
+        function generateCommitment() {
+            const student = document.getElementById('commit-student').value.trim() || "Estudiante Veneciano";
+            const family = document.getElementById('commit-family').value.trim() || "Familia Veneciana";
+            const goalSelect = document.getElementById('commit-goal');
+            const goalText = goalSelect.options[goalSelect.selectedIndex].text;
+
+            document.getElementById('card-student-name').textContent = student;
+            document.getElementById('card-fam-name').textContent = `Compromiso asumido con: ${family}`;
+            document.getElementById('card-goal-text').textContent = `🎯 "${goalText}"`;
+            
+            document.getElementById('commitment-card').classList.remove('hidden');
+        }
+
+        // ==========================================
+        // 3. JUEGO DE MEMORIA DE PARES (OBJETIVO ESPECÍFICO 3)
+        // ==========================================
+        
+        // 8 Pares de Nutrición e Hidratación Saludable
+        const NUTRI_PAIRS = [
+            { id: 'water', name: 'Agua Pura', icon: 'fa-glass-water', color: 'text-sky-500', info: '💧 Agua Pura: Mantiene el cerebro hidratado y evita dolores de cabeza en clase.' },
+            { id: 'apple', name: 'Manzana', icon: 'fa-apple-whole', color: 'text-rose-500', info: '🍎 Manzana: Aporta fibra y energía constante sin provocar picos bruscos de azúcar.' },
+            { id: 'egg', name: 'Huevo Cocido', icon: 'fa-egg', color: 'text-amber-500', info: '🥚 Huevo: Proteína de alta calidad para la memoria y reparación celular.' },
+            { id: 'nuts', name: 'Frutos Secos', icon: 'fa-seedling', color: 'text-emerald-600', info: '🥜 Frutos Secos: Grasas saludables (Omega 3) que potencian la concentración.' },
+            { id: 'banana', name: 'Banano', icon: 'fa-banana', color: 'text-yellow-500', info: '🍌 Banano: Rico en potasio y glucosa natural para evitar la fatiga muscular.' },
+            { id: 'oats', name: 'Avena', icon: 'fa-bowl-rice', color: 'text-amber-700', info: '🥣 Avena: Carbohidrato de absorción lenta para mantenerte activo toda la mañana.' },
+            { id: 'orange', name: 'Naranja', icon: 'fa-sun', color: 'text-orange-500', info: '🍊 Naranja: Vitamina C para reforzar el sistema inmune contra gripes escolares.' },
+            { id: 'carrot', name: 'Zanahoria', icon: 'fa-carrot', color: 'text-orange-600', info: '🥕 Zanahoria: Vitaminas para cuidar la salud visual al estudiar e investigar.' }
+        ];
+
+        let memoryDeck = [];
+        let flippedMemoryCards = [];
+        let matchedMemoryPairs = 0;
+        let memoryMoves = 0;
+        let memoryTimer = null;
+        let memorySeconds = 0;
+        let isMemoryGameActive = false;
+        let canFlipMemory = true;
+
+        function initMemoryGame() {
+            // Reiniciar estado
+            stopMemoryTimer();
+            memoryMoves = 0;
+            matchedMemoryPairs = 0;
+            flippedMemoryCards = [];
+            canFlipMemory = true;
+            isMemoryGameActive = false;
+            memorySeconds = 0;
+
+            document.getElementById('mem-moves').textContent = '0';
+            document.getElementById('mem-timer').textContent = '00:00';
+            document.getElementById('mem-pairs').textContent = '0';
+            document.getElementById('memory-info-text').textContent = '¡Voltea dos cartas idénticas para descubrir los beneficios de cada alimento!';
+            document.getElementById('memory-victory-modal').classList.add('hidden');
+
+            // Crear baraja duplicando los 8 pares y mezclando
+            memoryDeck = [...NUTRI_PAIRS, ...NUTRI_PAIRS].sort(() => 0.5 - Math.random());
+
+            const board = document.getElementById('memory-board');
+            board.innerHTML = '';
+
+            // Generar 16 cartas (4x4)
+            memoryDeck.forEach((item, index) => {
+                const card = document.createElement('div');
+                card.className = 'memory-card perspective-1000 w-full h-24 sm:h-28 cursor-pointer transition-transform transform hover:scale-105 active:scale-95';
+                card.dataset.id = item.id;
+                card.dataset.index = index;
+
+                card.innerHTML = `
+                    <div class="memory-card-inner">
+                        <div class="memory-card-front">
+                            <i class="fa-solid fa-apple-whole text-pink-200 text-2xl mb-1 opacity-80"></i>
+                            <span class="text-[9px] sm:text-[10px] font-bold text-pink-100 uppercase tracking-widest">Nutri-Fit</span>
+                        </div>
+                        <div class="memory-card-back">
+                            <i class="fa-solid ${item.icon} ${item.color} text-2xl sm:text-3xl mb-1"></i>
+                            <span class="text-[11px] sm:text-xs font-bold text-gray-800 leading-tight">${item.name}</span>
+                        </div>
+                    </div>
+                `;
+
+                card.addEventListener('click', () => handleMemoryCardClick(card, item));
+                board.appendChild(card);
+            });
+        }
+
+        function handleMemoryCardClick(card, item) {
+            if (!canFlipMemory || card.classList.contains('flipped') || card.classList.contains('matched')) {
+                return;
+            }
+
+            if (!isMemoryGameActive) {
+                startMemoryTimer();
+                isMemoryGameActive = true;
+            }
+
+            card.classList.add('flipped');
+            flippedMemoryCards.push({ card, item });
+
+            // Mostrar retroalimentación educativa inmediata
+            document.getElementById('memory-info-text').textContent = item.info;
+
+            if (flippedMemoryCards.length === 2) {
+                memoryMoves++;
+                document.getElementById('mem-moves').textContent = memoryMoves;
+                checkMemoryMatch();
+            }
+        }
+
+        function checkMemoryMatch() {
+            const [first, second] = flippedMemoryCards;
+            const isMatch = first.item.id === second.item.id;
+
+            if (isMatch) {
+                first.card.classList.add('matched');
+                second.card.classList.add('matched');
+                matchedMemoryPairs++;
+                document.getElementById('mem-pairs').textContent = matchedMemoryPairs;
+                flippedMemoryCards = [];
+
+                if (matchedMemoryPairs === 8) {
+                    stopMemoryTimer();
+                    setTimeout(showMemoryVictory, 500);
+                }
+            } else {
+                canFlipMemory = false;
+                setTimeout(() => {
+                    first.card.classList.remove('flipped');
+                    second.card.classList.remove('flipped');
+                    flippedMemoryCards = [];
+                    canFlipMemory = true;
+                }, 900);
+            }
+        }
+
+        function startMemoryTimer() {
+            stopMemoryTimer();
+            memoryTimer = setInterval(() => {
+                memorySeconds++;
+                const mins = String(Math.floor(memorySeconds / 60)).padStart(2, '0');
+                const secs = String(memorySeconds % 60).padStart(2, '0');
+                document.getElementById('mem-timer').textContent = `${mins}:${secs}`;
+            }, 1000);
+        }
+
+        function stopMemoryTimer() {
+            if (memoryTimer) clearInterval(memoryTimer);
+        }
+
+        function showMemoryVictory() {
+            document.getElementById('vic-moves').textContent = memoryMoves;
+            document.getElementById('vic-time').textContent = document.getElementById('mem-timer').textContent;
+            document.getElementById('memory-victory-modal').classList.remove('hidden');
+        }
+
+        // ==========================================
+        // SWITCH DE PESTAÑAS
+        // ==========================================
+        function switchTab(tab) {
+            ['marco', 'diag', 'fam', 'ped'].forEach(t => {
+                document.getElementById(`sec-${t}`).classList.add('hidden');
+                document.getElementById(`tab-${t}`).className = 'px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all bg-white text-gray-700 hover:bg-nutri-pink-light border border-pink-200';
+            });
+
+            document.getElementById(`sec-${tab}`).classList.remove('hidden');
+            document.getElementById(`tab-${tab}`).className = 'px-3 py-1.5 rounded-xl text-xs sm:text-sm font-bold transition-all bg-nutri-pink-vibrant text-white shadow-sm';
+
+            if (tab === 'diag' && diagAnswers[0] === null) {
+                renderDiagQuestion();
+            } else if (tab === 'ped') {
+                initMemoryGame();
+            }
+        }
+
+        window.onload = function() {
+            renderDiagQuestion();
+        };
+    </script>
+</body>
+</html>
